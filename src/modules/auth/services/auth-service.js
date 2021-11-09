@@ -1,5 +1,6 @@
 import apollo, { onLogin } from '@/plugins/apollo'
 import LoginMutation from './../graphql/Login.gql'
+import SignUpMutation from './../graphql/SignUp.gql'
 
 const login = async ({ email, password }) => {
   const response = await apollo.mutate({
@@ -14,6 +15,21 @@ const login = async ({ email, password }) => {
   return login
 }
 
+const signup = async ({ email, password, name }) => {
+  const response = await apollo.mutate({
+    mutation: SignUpMutation,
+    variables: {
+      email,
+      password,
+      name
+    }
+  })
+  const { signup } = response.data
+  await onLogin(apollo, signup.token)
+  return signup
+}
+
 export default {
-  login
+  login,
+  signup
 }
