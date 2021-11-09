@@ -11,32 +11,42 @@
         <v-card class="elevation-24">
 
           <v-toolbar color="primary" dark>
-            <v-toolbar-title>Login</v-toolbar-title>
+            <v-toolbar-title>{{ texts.toolbar }}</v-toolbar-title>
           </v-toolbar>
 
           <v-card-text>
             <v-form>
               <v-text-field
-                :error-messages="emailErrors"
-                :success="!$v.user.email.$invalid"
+                v-if="!isLogin"
+                prepend-icon="person"
+                name="name"
+                label="Nome"
+                type="text"
+                v-model.trim="$v.user.name.$model"
+                :error-messages="nameErrors"
+                :success="!$v.user.name.$invalid"
+              ></v-text-field>
+              <v-text-field
                 prepend-icon="email"
                 name="email"
                 label="Email"
                 type="email"
                 v-model.trim="$v.user.email.$model"
+                :error-messages="emailErrors"
+                :success="!$v.user.email.$invalid"
               ></v-text-field>
               <v-text-field
-                :error-messages="passwordErrors"
-                :success="!$v.user.password.$invalid"
                 prepend-icon="lock"
                 name="password"
                 label="Password"
                 type="password"
                 v-model.trim="$v.user.password.$model"
+                :error-messages="passwordErrors"
+                :success="!$v.user.password.$invalid"
               ></v-text-field>
             </v-form>
-            <v-btn block depressed>
-              Criar Conta
+            <v-btn block depressed @click="isLogin = !isLogin">
+              {{ texts.button }}
             </v-btn>
           </v-card-text>
 
@@ -47,7 +57,7 @@
               large
               :disabled="$v.$invalid"
               @click="submit">
-              Login
+              {{ texts.toolbar }}
             </v-btn>
           </v-card-actions>
 
@@ -65,13 +75,49 @@ export default {
   name: 'Login',
   data () {
     return {
+      isLogin: true,
       user: {
+        name: '',
         email: '',
         password: ''
       }
     }
   },
+  validations () {
+    const validations = {
+      user: {
+        email: {
+          required,
+          email
+        },
+        password: {
+          required,
+          minLength: minLength(6)
+        }
+      }
+    }
+
+    if (this.isLogin) { return validations }
+
+    return {
+      user: {
+        ...validations.user,
+        name: {
+          required,
+          minLength: minLength(3)
+        }
+      }
+    }
+  },
   computed: {
+    nameErrors () {
+      const errors = []
+      const name = this.$v.user.name
+      if (!name.$dirty) { return errors }
+      !name.required && errors.push('Esse campo é obrigatório')
+      !name.minLength && errors.push(`Insira no mínimo ${name.$params.minLength.min} caracteres`)
+      return errors
+    },
     emailErrors () {
       const errors = []
       const email = this.$v.user.email
@@ -87,18 +133,11 @@ export default {
       !password.required && errors.push('Esse campo é obrigatório')
       !password.minLength && errors.push(`Insira no mínimo ${password.$params.minLength.min} caracteres`)
       return errors
-    }
-  },
-  validations: {
-    user: {
-      email: {
-        required,
-        email
-      },
-      password: {
-        required,
-        minLength: minLength(6)
-      }
+    },
+    texts () {
+      return this.isLogin
+        ? { toolbar: 'Login', button: 'Criar Conta' }
+        : { toolbar: 'Criar Conta', button: 'Já possui uma conta' }
     }
   },
   methods: {
