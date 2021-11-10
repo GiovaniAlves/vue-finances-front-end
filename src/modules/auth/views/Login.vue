@@ -73,7 +73,7 @@
             top
           >
             {{ error }}
-            <v-btn color="red" flat icon @click="showSnackbar = false">
+            <v-btn color="pink" text icon @click="showSnackbar = false">
               <v-icon>close</v-icon>
             </v-btn>
           </v-snackbar>
