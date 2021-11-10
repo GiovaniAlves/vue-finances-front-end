@@ -68,6 +68,16 @@
             </v-btn>
           </v-card-actions>
 
+          <v-snackbar
+            v-model="showSnackbar"
+            top
+          >
+            {{ error }}
+            <v-btn color="red" flat icon @click="showSnackbar = false">
+              <v-icon>close</v-icon>
+            </v-btn>
+          </v-snackbar>
+
         </v-card>
       </v-flex>
     </v-layout>
@@ -78,13 +88,16 @@
 
 import { email, minLength, required } from 'vuelidate/lib/validators'
 import AuthService from './../services/auth-service'
+import { formatError } from '@/utils'
 
 export default {
   name: 'Login',
   data () {
     return {
+      error: undefined,
       isLogin: true,
       isLoading: false,
+      showSnackbar: false,
       user: {
         name: '',
         email: '',
@@ -167,13 +180,14 @@ export default {
     async submit () {
       this.isLoading = true
       try {
-        await new Promise(resolve => setTimeout(resolve, 3000))
         const authData = this.isLogin
           ? await AuthService.login(this.user)
           : await AuthService.signup(this.user)
         console.log('AuthData: ', authData)
       } catch (e) {
         console.log(e)
+        this.error = formatError(e.message)
+        this.showSnackbar = true
       } finally {
         this.isLoading = false
       }
