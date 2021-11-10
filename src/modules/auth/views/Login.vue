@@ -12,6 +12,13 @@
 
           <v-toolbar color="primary" dark>
             <v-toolbar-title>{{ texts.toolbar }}</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-progress-circular
+              v-show="isLoading"
+              indeterminate
+              color="white"
+              width="3">
+            </v-progress-circular>
           </v-toolbar>
 
           <v-card-text>
@@ -77,6 +84,7 @@ export default {
   data () {
     return {
       isLogin: true,
+      isLoading: false,
       user: {
         name: '',
         email: '',
@@ -98,7 +106,9 @@ export default {
       }
     }
 
-    if (this.isLogin) { return validations }
+    if (this.isLogin) {
+      return validations
+    }
 
     return {
       user: {
@@ -114,7 +124,9 @@ export default {
     nameErrors () {
       const errors = []
       const name = this.$v.user.name
-      if (!name.$dirty) { return errors }
+      if (!name.$dirty) {
+        return errors
+      }
       !name.required && errors.push('Esse campo é obrigatório')
       !name.minLength && errors.push(`Insira no mínimo ${name.$params.minLength.min} caracteres`)
       return errors
@@ -122,7 +134,9 @@ export default {
     emailErrors () {
       const errors = []
       const email = this.$v.user.email
-      if (!email.$dirty) { return errors }
+      if (!email.$dirty) {
+        return errors
+      }
       !email.email && errors.push('Insira um e-mail válido')
       !email.required && errors.push('Esse campo é obrigatório')
       return errors
@@ -130,22 +144,39 @@ export default {
     passwordErrors () {
       const errors = []
       const password = this.$v.user.password
-      if (!password.$dirty) { return errors }
+      if (!password.$dirty) {
+        return errors
+      }
       !password.required && errors.push('Esse campo é obrigatório')
       !password.minLength && errors.push(`Insira no mínimo ${password.$params.minLength.min} caracteres`)
       return errors
     },
     texts () {
       return this.isLogin
-        ? { toolbar: 'Login', button: 'Criar Conta' }
-        : { toolbar: 'Criar Conta', button: 'Já possui uma conta' }
+        ? {
+          toolbar: 'Login',
+          button: 'Criar Conta'
+        }
+        : {
+          toolbar: 'Criar Conta',
+          button: 'Já possui uma conta'
+        }
     }
   },
   methods: {
     async submit () {
-      console.log('Vuelidade: ', this.$v)
-      const authData = await AuthService.login(this.user)
-      console.log('AuthData: ', authData)
+      this.isLoading = true
+      try {
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        const authData = this.isLogin
+          ? await AuthService.login(this.user)
+          : await AuthService.signup(this.user)
+        console.log('AuthData: ', authData)
+      } catch (e) {
+        console.log(e)
+      } finally {
+        this.isLoading = false
+      }
     }
   }
 }
