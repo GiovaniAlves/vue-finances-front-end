@@ -3,7 +3,10 @@ import LoginMutation from './../graphql/Login.gql'
 import SignUpMutation from './../graphql/SignUp.gql'
 import UserQuery from './../graphql/User.gql'
 
-const login = async ({ email, password }) => {
+const login = async ({
+  email,
+  password
+}) => {
   const response = await apollo.mutate({
     mutation: LoginMutation,
     variables: {
@@ -16,7 +19,11 @@ const login = async ({ email, password }) => {
   return login
 }
 
-const signup = async ({ email, password, name }) => {
+const signup = async ({
+  email,
+  password,
+  name
+}) => {
   const response = await apollo.mutate({
     mutation: SignUpMutation,
     variables: {
