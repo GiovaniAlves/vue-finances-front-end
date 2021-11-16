@@ -1,8 +1,8 @@
 <template>
-  <v-list-item avatar>
+  <v-list-item>
 
     <v-list-item-avatar>
-      <v-icon :class="[ recordIconColor(record.type), 'lighten-1 white--text' ]"> {{ recordIcon(record.type)}} </v-icon>
+      <v-icon :class="[ recordIconColor(record.type), 'lighten-1 white--text' ]">{{ recordIcon(record.type) }}</v-icon>
     </v-list-item-avatar>
 
     <v-list-item-content>
