@@ -2,7 +2,7 @@
   <v-list-item>
 
     <v-list-item-avatar>
-      <v-icon :class="[ recordIconColor(record.type), 'lighten-1 white--text' ]">{{ recordIcon(record.type) }}</v-icon>
+      <v-icon :class="[ recordIconColor(record.type), 'lighten-1 white--text' ]"></v-icon>
     </v-list-item-avatar>
 
     <v-list-item-content>
@@ -11,15 +11,21 @@
     </v-list-item-content>
 
     <v-list-item-action>
-      <span :class="amountColor(record.amount)">{{ record.amount }}</span>
+      <span :class="amountColor(record.amount)">{{ formatCurrency(record.amount) }}</span>
     </v-list-item-action>
 
   </v-list-item>
 </template>
 
 <script>
+
+import formatCurrencyMixin from '@/mixins/format-currency'
+
 export default {
   name: 'RecordsListItem',
+  mixins: [
+    formatCurrencyMixin
+  ],
   props: {
     record: Object
   },
