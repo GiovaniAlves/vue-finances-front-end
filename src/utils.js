@@ -1,3 +1,10 @@
+const currencyFormatter = ({ locale, currency } = { locale: 'pt-BR', currency: 'BRL' }) => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency
+  })
+}
+
 const errorHandler = (error, vm, info) => {
   console.log('Error Handler: ', error, info)
   const jwtErrors = ['jwt malformed', 'jwt expired', 'jwt not active', 'invalid token']
@@ -14,15 +21,22 @@ const formatError = message => {
   return messageSplit[messageSplit.length - 1].trim()
 }
 
-const currencyFormatter = ({ locale, currency } = { locale: 'pt-BR', currency: 'BRL' }) => {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency
-  })
+const groupBy = (array, key, makeCurrentKey) => {
+  return array.reduce((acumulated, item) => {
+    const currentKey = makeCurrentKey(item, key) // (record == item) AND (key == date)
+    return {
+      ...acumulated,
+      [currentKey]: [
+        ...(acumulated[currentKey] || []),
+        item
+      ]
+    }
+  }, {})
 }
 
 export {
   currencyFormatter,
   errorHandler,
-  formatError
+  formatError,
+  groupBy
 }
