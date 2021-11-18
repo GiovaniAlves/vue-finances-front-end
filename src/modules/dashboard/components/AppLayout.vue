@@ -11,16 +11,20 @@
       </v-layout>
     </v-container>
 
+    <AppFloatActionButton />
+
   </div>
 </template>
 
 <script>
 import AppToolbar from './AppToolbar'
 import AppMenu from './AppMenu'
+import AppFloatActionButton from './AppFloatActionButton'
 
 export default {
   name: 'AppLayout',
   components: {
+    AppFloatActionButton,
     AppMenu,
     AppToolbar
   },
