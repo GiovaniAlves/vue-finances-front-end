@@ -1,22 +1,40 @@
+<script src="../services/records-service.js"></script>
 <template>
   <div>
 
     <ToolbarByMonth
       class="mb-2"
       format="MM-YYYY"
-      @month="changeMonth"/>
+      @month="changeMonth"
+      :month="$route.query.month"/>
 
     <v-card>
 
-      <v-list two-line subheader>
-        <template v-for="(groupedRec, dateKey, index) in groupedRecords">
-          <v-subheader :key="dateKey">{{ dateKey }}</v-subheader>
-          <RecordsListItem
-            v-for="record in groupedRec"
-            :key="record.id"
-            :record="record"/>
-          <v-divider :key="`${dateKey}-${index}`" v-if="showDivider(index, groupedRecords)"></v-divider>
-        </template>
+      <v-card-text
+        class="flex text-center"
+        v-if="groupedRecordsLenght === 0">
+          <v-icon
+            size="100"
+            color="grey">
+              assignment
+          </v-icon>
+          <p class="font-weight-light subheading grey-text">
+            Nenhum lançamento no período.
+          </p>
+      </v-card-text>
+
+      <v-list
+        two-line
+        subheader
+        v-else>
+          <template v-for="(groupedRec, dateKey, index) in groupedRecords">
+            <v-subheader :key="dateKey">{{ dateKey }}</v-subheader>
+            <RecordsListItem
+              v-for="record in groupedRec"
+              :key="record.id"
+              :record="record"/>
+            <v-divider :key="`${dateKey}-${index}`" v-if="showDivider(index, groupedRecords)"></v-divider>
+          </template>
       </v-list>
 
       <v-footer class="pa-2">
@@ -62,12 +80,19 @@ export default {
         return moment(record[datekey]).format('DD/MM/YYYY')
       })
     },
+    groupedRecordsLenght () {
+      return Object.keys(this.groupedRecords).length
+    },
     totalAmount () {
       return this.records.reduce((sum, record) => sum + record.amount, 0)
     }
   },
   methods: {
     changeMonth (month) {
+      this.$router.push({
+        path: this.$route.path,
+        query: { month }
+      }).catch(() => {})
       console.log('Month: ', month)
       this.setRecords(month)
     },

@@ -39,11 +39,12 @@ import moment from 'moment'
 export default {
   name: 'ToolbarByMonth',
   props: {
-    format: String
+    format: String,
+    month: String
   },
   data () {
     return {
-      date: moment()
+      date: undefined
     }
   },
   computed: {
@@ -52,6 +53,7 @@ export default {
     }
   },
   created () {
+    this.setCurrentMonth()
     this.emit()
   },
   methods: {
@@ -65,6 +67,9 @@ export default {
     increment () {
       this.date = this.date.clone().add(1, 'month')
       this.emit()
+    },
+    setCurrentMonth () {
+      this.date = this.month ? moment(this.month, this.format) : moment()
     }
   }
 }
