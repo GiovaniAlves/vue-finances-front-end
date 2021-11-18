@@ -17,7 +17,7 @@ const totalBalance = async () => {
   const response = await apollo.query({
     query: TotalBalanceQuery,
     variables: {
-      date: moment.format('YYYY-MM-DD')
+      date: moment().format('YYYY-MM-DD')
     }
   })
 

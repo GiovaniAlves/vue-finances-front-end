@@ -1,6 +1,7 @@
-<script src="../services/records-service.js"></script>
 <template>
   <div>
+
+    <TotalBalance class="mb-2" />
 
     <ToolbarByMonth
       class="mb-2"
@@ -61,10 +62,11 @@ import moment from 'moment'
 import RecordsListItem from './RecordsListItem'
 import RecordsService from './../services/records-service'
 import ToolbarByMonth from './ToolbarByMonth'
+import TotalBalance from './TotalBalance'
 
 export default {
   name: 'RecordsList',
-  components: { ToolbarByMonth, RecordsListItem },
+  components: { TotalBalance, ToolbarByMonth, RecordsListItem },
   mixins: [
     amountColorMixin,
     formatCurrencyMixin
