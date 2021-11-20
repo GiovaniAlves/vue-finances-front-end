@@ -18,41 +18,68 @@
         md8
         lg8>
 
-        <v-select
-          name="account"
-          label="Conta"
-          prepend-icon="account_balance"
-          :items="accounts"
-          item-text="description"
-          item-value="id"
-          v-model="record.accountId"></v-select>
+        <v-card>
+          <v-card-text>
+            <v-form>
+              <v-select
+                name="account"
+                label="Conta"
+                prepend-icon="account_balance"
+                :items="accounts"
+                item-text="description"
+                item-value="id"
+                v-model="$v.record.accountId.$model"></v-select>
 
-        <v-select
-          name="category"
-          label="Categoria"
-          prepend-icon="class"
-          :items="categories"
-          item-text="description"
-          item-value="id"
-          v-model="record.categoryId"></v-select>
+              <v-select
+                name="category"
+                label="Categoria"
+                prepend-icon="class"
+                :items="categories"
+                item-text="description"
+                item-value="id"
+                v-model="$v.record.categoryId.$model"></v-select>
 
-        <v-text-field
-          name="description"
-          label="Descrição"
-          prepend-icon="description"
-          type="text"></v-text-field>
+              <v-text-field
+                name="description"
+                label="Descrição"
+                prepend-icon="description"
+                type="text"
+                v-model="$v.record.description.$model"></v-text-field>
 
-        <v-text-field
-          name="tags"
-          label="Tags (Separadas por virgula)"
-          prepend-icon="label"
-          type="text"></v-text-field>
+              <v-text-field
+                name="tags"
+                label="Tags (Separadas por virgula)"
+                prepend-icon="label"
+                type="text"
+                v-model="record.tags"></v-text-field>
 
-        <v-text-field
-          name="note"
-          label="Observações"
-          prepend-icon="note"
-          type="text"></v-text-field>
+              <v-text-field
+                name="note"
+                label="Observações"
+                prepend-icon="note"
+                type="text"
+                v-model="record.note"></v-text-field>
+            </v-form>
+          </v-card-text>
+        </v-card>
+
+        <v-btn
+          color="secondary"
+          large
+          fab
+          class="mt-4 mr-3"
+          @click="$router.back()">
+            <v-icon>close</v-icon>
+        </v-btn>
+
+        <v-btn
+          :color="color"
+          large
+          fab
+          class="mt-4"
+          @click="submit">
+          <v-icon>check</v-icon>
+        </v-btn>
 
       </v-flex>
 
@@ -84,6 +111,19 @@ export default {
         description: '',
         tags: '',
         note: ''
+      }
+    }
+  },
+  computed: {
+    color () {
+      switch (this.record.type) {
+        case 'CREDIT':
+          return 'primary'
+        case 'DEBIT':
+          return 'error'
+
+        default:
+          return 'primary'
       }
     }
   },
@@ -132,8 +172,8 @@ export default {
       }
       this.setTitle({ title })
     },
-    log () {
-      console.log('Form: ', this.record)
+    submit () {
+      console.log('Form: ', this.$v)
     }
   }
 }
