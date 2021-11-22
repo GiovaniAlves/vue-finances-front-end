@@ -9,7 +9,7 @@
         sm6
         md4
         lg4>
-        <NumericDisplay :color="color"/>
+        <NumericDisplay :color="color" v-model="$v.record.amount.$model"/>
       </v-flex>
 
       <v-flex
@@ -47,17 +47,17 @@
                   locale="pt-br"
                   scrollable
                   v-model="dateDialogValue">
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      text
-                      :color="color"
-                      @click="cancelDateDialog">Cancelar
-                    </v-btn>
-                    <v-btn
-                      text
-                      :color="color"
-                      @click="$refs.dateDialog.save(dateDialogValue)">OK
-                    </v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    text
+                    :color="color"
+                    @click="cancelDateDialog">Cancelar
+                  </v-btn>
+                  <v-btn
+                    text
+                    :color="color"
+                    @click="$refs.dateDialog.save(dateDialogValue)">OK
+                  </v-btn>
                 </v-date-picker>
 
               </v-dialog>
@@ -147,7 +147,8 @@
           large
           fab
           class="mt-4"
-          @click="submit">
+          @click="submit"
+          :disabled="$v.$invalid">
           <v-icon>check</v-icon>
         </v-btn>
 
@@ -165,6 +166,7 @@ import moment from 'moment'
 
 import AccountsService from './../services/accounts-service'
 import CategoriesService from './../services/categories-service'
+import RecordsService from './../services/records-service'
 import NumericDisplay from '../components/NumericDisplay'
 
 export default {
@@ -232,6 +234,7 @@ export default {
     const { type } = to.query
     this.changeTitle(type)
     this.record.type = type.toUpperCase()
+    this.record.categoryId = ''
     this.categories = await CategoriesService.categories({ operation: type })
     next()
   },
@@ -255,8 +258,14 @@ export default {
       }
       this.setTitle({ title })
     },
-    submit () {
-      console.log('Form: ', this.record)
+    async submit () {
+      try {
+        const response = await RecordsService.createRecord(this.record)
+        console.log('Record: ', response)
+        this.$router.push('/dashboard/records')
+      } catch (e) {
+        console.log('Erro creating record: ', e)
+      }
     }
   }
 }

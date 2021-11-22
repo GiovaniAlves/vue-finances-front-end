@@ -95,7 +95,6 @@ export default {
         path: this.$route.path,
         query: { month }
       }).catch(() => {})
-      console.log('Month: ', month)
       this.setRecords(month)
     },
     async setRecords (month) {
