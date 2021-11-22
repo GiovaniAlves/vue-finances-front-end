@@ -9,7 +9,7 @@
         sm6
         md4
         lg4>
-        <p>Amount</p>
+        <NumericDisplay :color="color"/>
       </v-flex>
 
       <v-flex
@@ -21,6 +21,47 @@
         <v-card>
           <v-card-text>
             <v-form>
+
+              <v-dialog
+                ref="dateDialog"
+                :return-value.sync="record.date"
+                v-model="shownDateDialog"
+                persistent
+                width="290px">
+
+                <template v-slot:activator="{ on }">
+                  <v-text-field
+                    name="date"
+                    label="Vencimento"
+                    prepend-icon="event"
+                    type="text"
+                    readonly
+                    :value="formattedDate"
+                    v-on="on">
+
+                  </v-text-field>
+                </template>
+
+                <v-date-picker
+                  :color="color"
+                  locale="pt-br"
+                  scrollable
+                  v-model="dateDialogValue">
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      text
+                      :color="color"
+                      @click="cancelDateDialog">Cancelar
+                    </v-btn>
+                    <v-btn
+                      text
+                      :color="color"
+                      @click="$refs.dateDialog.save(dateDialogValue)">OK
+                    </v-btn>
+                </v-date-picker>
+
+              </v-dialog>
+
               <v-select
                 name="account"
                 label="Conta"
@@ -44,22 +85,51 @@
                 label="Descrição"
                 prepend-icon="description"
                 type="text"
-                v-model="$v.record.description.$model"></v-text-field>
+                v-model.trim="$v.record.description.$model"></v-text-field>
 
               <v-text-field
+                v-show="shownTagsInput"
                 name="tags"
                 label="Tags (Separadas por virgula)"
                 prepend-icon="label"
                 type="text"
-                v-model="record.tags"></v-text-field>
+                v-model.trim="record.tags"></v-text-field>
 
               <v-text-field
+                v-show="shownNoteInput"
                 name="note"
                 label="Observações"
                 prepend-icon="note"
                 type="text"
-                v-model="record.note"></v-text-field>
+                v-model.trim="record.note"></v-text-field>
             </v-form>
+
+            <v-tooltip left>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  small
+                  v-on="on"
+                  @click="shownTagsInput = !shownTagsInput">
+                  <v-icon :color="color">label</v-icon>
+                </v-btn>
+              </template>
+              <span>Adicionar Tags</span>
+            </v-tooltip>
+
+            <v-tooltip right>
+              <template v-slot:activator="{ on }">
+                <v-btn
+                  icon
+                  small
+                  v-on="on"
+                  @click="shownNoteInput = !shownNoteInput">
+                  <v-icon :color="color">note</v-icon>
+                </v-btn>
+              </template>
+              <span>Adicionar Observações</span>
+            </v-tooltip>
+
           </v-card-text>
         </v-card>
 
@@ -69,7 +139,7 @@
           fab
           class="mt-4 mr-3"
           @click="$router.back()">
-            <v-icon>close</v-icon>
+          <v-icon>close</v-icon>
         </v-btn>
 
         <v-btn
@@ -95,13 +165,16 @@ import moment from 'moment'
 
 import AccountsService from './../services/accounts-service'
 import CategoriesService from './../services/categories-service'
+import NumericDisplay from '../components/NumericDisplay'
 
 export default {
   name: 'RecordsAdd',
+  components: { NumericDisplay },
   data () {
     return {
       accounts: [],
       categories: [],
+      dateDialogValue: moment().format('YYYY-MM-DD'),
       record: {
         type: this.$route.query.type.toUpperCase(),
         amount: 0,
@@ -111,7 +184,10 @@ export default {
         description: '',
         tags: '',
         note: ''
-      }
+      },
+      shownDateDialog: false,
+      shownTagsInput: false,
+      shownNoteInput: false
     }
   },
   computed: {
@@ -125,6 +201,9 @@ export default {
         default:
           return 'primary'
       }
+    },
+    formattedDate () {
+      return moment(this.record.date).format('DD/MM/YYYY')
     }
   },
   validations: {
@@ -158,6 +237,10 @@ export default {
   },
   methods: {
     ...mapActions(['setTitle']),
+    cancelDateDialog () {
+      this.shownDateDialog = false
+      this.dateDialogValue = this.record.date
+    },
     changeTitle (recordType) {
       let title
       switch (recordType) {
@@ -173,7 +256,7 @@ export default {
       this.setTitle({ title })
     },
     submit () {
-      console.log('Form: ', this.$v)
+      console.log('Form: ', this.record)
     }
   }
 }
