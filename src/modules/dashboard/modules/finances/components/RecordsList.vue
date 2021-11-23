@@ -57,6 +57,8 @@ import { groupBy } from '@/utils'
 
 import amountColorMixin from './../mixins/amount-color'
 import formatCurrencyMixin from '@/mixins/format-currency'
+import { mergeMap } from 'rxjs/operators'
+import { Subject } from 'rxjs'
 
 import moment from 'moment'
 import RecordsListItem from './RecordsListItem'
@@ -73,7 +75,8 @@ export default {
   ],
   data () {
     return {
-      records: []
+      records: [],
+      monthSubject$: new Subject() // É um tipo de observable do rxjs, e a partir dele podemos emitir eventos
     }
   },
   computed: {
@@ -89,16 +92,24 @@ export default {
       return this.records.reduce((sum, record) => sum + record.amount, 0)
     }
   },
+  created () {
+    this.setRecords()
+  },
   methods: {
     changeMonth (month) {
       this.$router.push({
         path: this.$route.path,
         query: { month }
       }).catch(() => {})
-      this.setRecords(month)
+      this.monthSubject$.next({ month })
     },
-    async setRecords (month) {
-      this.records = await RecordsService.records({ month })
+    setRecords (month) {
+      console.log('Subscribing...')
+
+      this.monthSubject$
+        .pipe(
+          mergeMap(variables => RecordsService.records(variables))
+        ).subscribe(records => (this.records = records))
     },
     showDivider (index, object) {
       return index < Object.keys(object).length - 1
