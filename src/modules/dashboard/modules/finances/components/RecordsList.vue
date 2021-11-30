@@ -82,7 +82,7 @@ export default {
   computed: {
     groupedRecords () {
       return groupBy(this.records, 'date', (record, datekey) => {
-        return moment(record[datekey]).format('DD/MM/YYYY')
+        return moment(record[datekey].substr(0, 10)).format('DD/MM/YYYY')
       })
     },
     groupedRecordsLenght () {

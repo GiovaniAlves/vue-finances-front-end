@@ -1,6 +1,8 @@
 # Vue Finances Front End
 
-## Project setup
+### Was developed during the Vue JS - O Guia Completo course of professor Plinio Naves this Front End application using Vue JS, Graphql and Apollo Boost.
+
+### Project setup
 ```
 npm install
 ```
