@@ -72,11 +72,12 @@
                 v-model="$v.record.accountId.$model">
                   <v-list-item
                     slot="prepend-item"
-                    ripple>
-                      <v-list-item-action>
-                        <v-icon>add</v-icon>
-                      </v-list-item-action>
-                      <v-list-item-title>Conta</v-list-item-title>
+                    ripple
+                    @click="addEntity('account')">
+                    <v-list-item-action>
+                      <v-icon>add</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-title>Conta</v-list-item-title>
                   </v-list-item>
                   <v-divider
                     slot="prepend-item"
@@ -93,7 +94,8 @@
                 v-model="$v.record.categoryId.$model">
                   <v-list-item
                     slot="prepend-item"
-                    ripple>
+                    ripple
+                    @click="addEntity('category')">
                     <v-list-item-action>
                       <v-icon>add</v-icon>
                     </v-list-item-action>
@@ -176,6 +178,15 @@
           <v-icon>check</v-icon>
         </v-btn>
 
+        <v-dialog
+          v-model="showDialogAccountCategory"
+          max-width="350px">
+          <AccountCategoryAdd
+            :entity="entity"
+            v-if="showDialogAccountCategory"
+            @close="showDialogAccountCategory = false"/>
+        </v-dialog>
+
       </v-flex>
 
     </v-layout>
@@ -188,6 +199,7 @@ import { decimal, minLength, required } from 'vuelidate/lib/validators'
 import { mapActions } from 'vuex'
 import moment from 'moment'
 
+import AccountCategoryAdd from '../components/AccountCategoryAdd'
 import AccountsService from './../services/accounts-service'
 import CategoriesService from './../services/categories-service'
 import RecordsService from './../services/records-service'
@@ -195,12 +207,13 @@ import NumericDisplay from '../components/NumericDisplay'
 
 export default {
   name: 'RecordsAdd',
-  components: { NumericDisplay },
+  components: { AccountCategoryAdd, NumericDisplay },
   data () {
     return {
       accounts: [],
       categories: [],
       dateDialogValue: moment().format('YYYY-MM-DD'),
+      entity: '',
       record: {
         type: this.$route.query.type.toUpperCase(),
         amount: 0,
@@ -211,6 +224,7 @@ export default {
         tags: '',
         note: ''
       },
+      showDialogAccountCategory: false,
       shownDateDialog: false,
       shownTagsInput: false,
       shownNoteInput: false
@@ -264,6 +278,10 @@ export default {
   },
   methods: {
     ...mapActions(['setTitle']),
+    addEntity (entity) {
+      this.showDialogAccountCategory = true
+      this.entity = entity
+    },
     cancelDateDialog () {
       this.shownDateDialog = false
       this.dateDialogValue = this.record.date
