@@ -69,7 +69,19 @@
                 :items="accounts"
                 item-text="description"
                 item-value="id"
-                v-model="$v.record.accountId.$model"></v-select>
+                v-model="$v.record.accountId.$model">
+                  <v-list-item
+                    slot="prepend-item"
+                    ripple>
+                      <v-list-item-action>
+                        <v-icon>add</v-icon>
+                      </v-list-item-action>
+                      <v-list-item-title>Conta</v-list-item-title>
+                  </v-list-item>
+                  <v-divider
+                    slot="prepend-item"
+                    class="mt-2"></v-divider>
+              </v-select>
 
               <v-select
                 name="category"
@@ -78,7 +90,19 @@
                 :items="categories"
                 item-text="description"
                 item-value="id"
-                v-model="$v.record.categoryId.$model"></v-select>
+                v-model="$v.record.categoryId.$model">
+                  <v-list-item
+                    slot="prepend-item"
+                    ripple>
+                    <v-list-item-action>
+                      <v-icon>add</v-icon>
+                    </v-list-item-action>
+                    <v-list-item-title>Categoria</v-list-item-title>
+                  </v-list-item>
+                  <v-divider
+                    slot="prepend-item"
+                    class="mt-2"></v-divider>
+              </v-select>
 
               <v-text-field
                 name="description"
