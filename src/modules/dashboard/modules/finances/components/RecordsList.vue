@@ -76,7 +76,8 @@ export default {
   data () {
     return {
       records: [],
-      monthSubject$: new Subject() // É um tipo de observable do rxjs, e a partir dele podemos emitir eventos
+      monthSubject$: new Subject(), // É um tipo de observable do rxjs, e a partir dele podemos emitir eventos
+      subscriptions: []
     }
   },
   computed: {
@@ -95,6 +96,9 @@ export default {
   created () {
     this.setRecords()
   },
+  destroyed () {
+    this.subscriptions.forEach(subscriptions => subscriptions.unsubscribe())
+  },
   methods: {
     changeMonth (month) {
       this.$router.push({
@@ -104,12 +108,12 @@ export default {
       this.monthSubject$.next({ month })
     },
     setRecords (month) {
-      console.log('Subscribing...')
-
-      this.monthSubject$
-        .pipe(
-          mergeMap(variables => RecordsService.records(variables))
-        ).subscribe(records => (this.records = records))
+      this.subscriptions.push(
+        this.monthSubject$
+          .pipe(
+            mergeMap(variables => RecordsService.records(variables))
+          ).subscribe(records => (this.records = records))
+      )
     },
     showDivider (index, object) {
       return index < Object.keys(object).length - 1
@@ -117,7 +121,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

@@ -6,7 +6,7 @@ const currencyFormatter = ({ locale, currency } = { locale: 'pt-BR', currency: '
 }
 
 const errorHandler = (error, vm, info) => {
-  console.log('Error Handler: ', error, info)
+  console.log('Error Handler: ', 'Instancia vue: ', vm, 'error: ', error, 'info: ', info)
   const jwtErrors = ['jwt malformed', 'jwt expired', 'jwt not active', 'invalid token']
   if (jwtErrors.some(jwtError => error.message.includes(jwtError))) {
     vm.$router.push({

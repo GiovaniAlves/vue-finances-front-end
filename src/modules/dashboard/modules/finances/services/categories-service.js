@@ -1,17 +1,19 @@
 import apollo from '@/plugins/apollo'
+import { from } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 import CategoriesQuery from './../graphql/Categories.gql'
 import CategoryCreateMutation from './../graphql/CategoryCreate.gql'
 
-const categories = async ({ operation }) => {
-  try {
-    const response = await apollo.query({
-      query: CategoriesQuery,
-      variables: { operation: operation ? operation.toUpperCase() : operation }
-    })
-    return response.data.categories
-  } catch (e) {
-    console.log(e)
-  }
+const categories = ({ operation }) => {
+  const queryRef = apollo.watchQuery({
+    query: CategoriesQuery,
+    variables: { operation: operation ? operation.toUpperCase() : operation }
+  })
+  return from(queryRef)
+    .pipe(
+      map(res => res.data.categories)
+    )
 }
 
 const createCategory = async variables => {
@@ -34,15 +36,15 @@ const createCategory = async variables => {
           data
         })
       } catch (e) {
-        console.log('Query "categories" has not been read yet!')
+        console.log('Query "categories" has not been read yet!', e)
       }
     }
   })
-
+  console.log(response, ' qwerty ', response.data.createCategory, 'e....')
   return response.data.createCategory
 }
 
 export default {
-  createCategory,
-  categories
+  categories,
+  createCategory
 }

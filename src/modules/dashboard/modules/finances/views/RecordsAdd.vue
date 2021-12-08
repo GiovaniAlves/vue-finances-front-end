@@ -92,18 +92,6 @@
                 item-text="description"
                 item-value="id"
                 v-model="$v.record.categoryId.$model">
-                  <v-list-item
-                    slot="prepend-item"
-                    ripple
-                    @click="addEntity('category')">
-                    <v-list-item-action>
-                      <v-icon>add</v-icon>
-                    </v-list-item-action>
-                    <v-list-item-title>Categoria</v-list-item-title>
-                  </v-list-item>
-                  <v-divider
-                    slot="prepend-item"
-                    class="mt-2"></v-divider>
               </v-select>
 
               <v-text-field
@@ -181,10 +169,11 @@
         <v-dialog
           v-model="showDialogAccountCategory"
           max-width="350px">
-          <AccountCategoryAdd
-            :entity="entity"
-            v-if="showDialogAccountCategory"
-            @close="showDialogAccountCategory = false"/>
+            <AccountCategoryAdd
+              :entity="entity"
+              v-if="showDialogAccountCategory"
+              @close="showDialogAccountCategory = false"
+              @saved="accountCategorySaved"/>
         </v-dialog>
 
       </v-flex>
@@ -196,8 +185,10 @@
 <script>
 
 import { decimal, minLength, required } from 'vuelidate/lib/validators'
-import { mapActions } from 'vuex'
 import moment from 'moment'
+import { mapActions } from 'vuex'
+import { Subject } from 'rxjs'
+import { distinctUntilChanged, mergeMap } from 'rxjs/operators'
 
 import AccountCategoryAdd from '../components/AccountCategoryAdd'
 import AccountsService from './../services/accounts-service'
@@ -212,6 +203,7 @@ export default {
     return {
       accounts: [],
       categories: [],
+      operationSubject$: new Subject(), // Criei essa proprieda pois temos mais tipo de opeação na conta
       dateDialogValue: moment().format('YYYY-MM-DD'),
       entity: '',
       record: {
@@ -227,7 +219,8 @@ export default {
       showDialogAccountCategory: false,
       shownDateDialog: false,
       shownTagsInput: false,
-      shownNoteInput: false
+      shownNoteInput: false,
+      subscriptions: []
     }
   },
   computed: {
@@ -263,21 +256,41 @@ export default {
       }
     }
   },
-  async created () {
+  created () {
     this.changeTitle(this.$route.query.type)
-    this.accounts = await AccountsService.accounts()
-    this.categories = await CategoriesService.categories({ operation: this.$route.query.type })
+
+    this.subscriptions.push(
+      AccountsService.accounts()
+        .subscribe(accounts => (this.accounts = accounts))
+    )
+
+    this.subscriptions.push(
+      this.operationSubject$
+        .pipe(
+          distinctUntilChanged(),
+          mergeMap(operation => CategoriesService.categories({ operation }))
+        ).subscribe(categories => (this.categories = categories))
+    )
+
+    this.operationSubject$.next(this.$route.query.type)
   },
-  async beforeRouteUpdate (to, from, next) {
+  beforeRouteUpdate (to, from, next) {
     const { type } = to.query
     this.changeTitle(type)
     this.record.type = type.toUpperCase()
     this.record.categoryId = ''
-    this.categories = await CategoriesService.categories({ operation: type })
+    this.operationSubject$.next(type)
     next()
+  },
+  destroyed () {
+    this.subscriptions.forEach(subscriptions => subscriptions.unsubscribe())
   },
   methods: {
     ...mapActions(['setTitle']),
+    accountCategorySaved (item) {
+      this.showDialogAccountCategory = false
+      this.record[`${this.entity}Id`] = item.id
+    },
     addEntity (entity) {
       this.showDialogAccountCategory = true
       this.entity = entity

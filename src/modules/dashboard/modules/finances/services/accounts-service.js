@@ -1,12 +1,18 @@
 import apollo from '@/plugins/apollo'
+import { from } from 'rxjs'
+import { map } from 'rxjs/operators'
+
 import AccountsQuery from './../graphql/Accounts.gql'
 import AccountCreateMutation from './../graphql/AccountCreate.gql'
 
-const accounts = async () => {
-  const response = await apollo.query({
+const accounts = () => {
+  const queryRef = apollo.watchQuery({
     query: AccountsQuery
   })
-  return response.data.accounts
+  return from(queryRef)
+    .pipe(
+      map(res => res.data.accounts)
+    )
 }
 
 const createAccount = async variables => {
@@ -26,7 +32,7 @@ const createAccount = async variables => {
           data: AccountData.accounts
         })
       } catch (e) {
-        console.log('Query "Accounts" has not been read yet!')
+        console.log('Query "Accounts" has not been read yet!', e)
       }
     }
   })
