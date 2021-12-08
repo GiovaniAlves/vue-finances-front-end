@@ -82,7 +82,7 @@ const records = variables => {
     recordsWatchedQueries[hashKey] = queryRef
   }
 
-  return from(queryRef)
+  return from(queryRef) // Se eu já tiver essa query armazenada eu só retorno.
     .pipe(
       map(response => response.data.records)
     )
