@@ -7,7 +7,11 @@
       class="mb-2"
       format="MM-YYYY"
       @month="changeMonth"
-      :month="$route.query.month"/>
+      :month="$route.query.month"
+      :show-slot="true"
+    >
+      <RecordsFilter/>
+    </ToolbarByMonth>
 
     <v-card>
 
@@ -65,10 +69,11 @@ import RecordsListItem from './RecordsListItem'
 import RecordsService from './../services/records-service'
 import ToolbarByMonth from './ToolbarByMonth'
 import TotalBalance from './TotalBalance'
+import RecordsFilter from './RecordsFilter'
 
 export default {
   name: 'RecordsList',
-  components: { TotalBalance, ToolbarByMonth, RecordsListItem },
+  components: { RecordsFilter, TotalBalance, ToolbarByMonth, RecordsListItem },
   mixins: [
     amountColorMixin,
     formatCurrencyMixin

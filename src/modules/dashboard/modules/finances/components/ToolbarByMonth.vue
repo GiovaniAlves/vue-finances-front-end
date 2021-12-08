@@ -12,13 +12,24 @@
         </div>
       </v-flex>
 
-      <v-flex xs10>
-        <v-toolbar-title class="flex text-center">
-          <span>{{ currentMonth }}</span>
-        </v-toolbar-title>
+      <v-flex
+        xs8
+        offset-xs1>
+          <v-toolbar-title class="flex text-center">
+            <span>{{ currentMonth }}</span>
+          </v-toolbar-title>
       </v-flex>
 
-      <v-flex xs1>
+      <v-flex
+        xs1
+        text-xs-right
+        v-if="showSlot">
+          <slot />
+      </v-flex>
+
+      <v-flex
+        xs1
+        :class="arrowRightClass">
         <div class="text-xs-right">
           <v-btn
             icon
@@ -40,7 +51,11 @@ export default {
   name: 'ToolbarByMonth',
   props: {
     format: String,
-    month: String
+    month: String,
+    showSlot: {
+      type: Boolean,
+      default: false
+    }
   },
   data () {
     return {
@@ -48,6 +63,9 @@ export default {
     }
   },
   computed: {
+    arrowRightClass () {
+      return !this.showSlot ? 'offset-xs1' : ''
+    },
     currentMonth () {
       return this.date.format('MMMM YYYY') // Pegando o mês e o ano de forma completa
     }
