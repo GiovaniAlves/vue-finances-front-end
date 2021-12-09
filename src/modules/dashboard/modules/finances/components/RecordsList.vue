@@ -7,7 +7,7 @@
       class="mb-2"
       format="MM-YYYY"
       @month="changeMonth"
-      :month="$route.query.month"
+      :month="month || $route.query.month"
       :show-slot="true"
     >
       <RecordsFilter
