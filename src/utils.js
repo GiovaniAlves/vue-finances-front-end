@@ -27,13 +27,56 @@ const formatError = message => {
   return messageSplit[messageSplit.length - 1].trim()
 }
 
+const generateChartOptions = (type) => {
+  let tooltips = {}
+  switch (type) {
+    case 'bar':
+      tooltips = {
+        callbacks: {
+          label (tooltip, data) {
+            return data.datasets[tooltip.datasetIndex].label
+          }
+        }
+      }
+      break
+
+    case 'doughnut':
+      tooltips = {
+        callbacks: {
+          label (tooltip, data) {
+            const label = data.labels[tooltip.index]
+            const value = currencyFormatter()
+              .format(data.datasets[tooltip.datasetIndex].data[tooltip.index])
+            return `${label}: ${value}`
+          }
+        }
+      }
+      break
+  }
+
+  const scales = {
+    yAxes: [{
+      ticks: {
+        beginAtZero: true
+      }
+    }]
+  }
+
+  return {
+    scales,
+    tooltips
+  }
+}
+
 const generateChartConfigs = opts => {
   const { type } = opts
   const data = generateChartData(opts)
+  const options = generateChartOptions(type)
 
   return {
     data,
-    type
+    type,
+    options
   }
 }
 
@@ -50,17 +93,28 @@ const generateChartData = ({ items, keyToGroup, keyOfValue, aliases, type, backg
         }, 0)
   }
 
-  const labels = Object.keys(response) // Receitas e Despesas
+  const labels = Object.keys(response)
 
   switch (type) {
     case 'bar':
       return {
         datasets: labels.map((label, index) => ({
           label: `${label}: ${currencyFormatter().format(response[label])}`,
-          data: [response[label]],
-          backgroundColor: backgroundColors[index],
+          data: [response[label] >= 0 ? response[label] : -response[label]],
+          backgroundColor: [response[label] >= 0 ? backgroundColors[1] : backgroundColors[0]],
           borderWidth: 0
-        }))
+        })),
+        labels: ['']
+      }
+
+    case 'doughnut':
+      return {
+        datasets: [{
+          data: labels.map(label => response[label] >= 0 ? response[label] : -response[label]),
+          backgroundColor: backgroundColors,
+          borderWidth: 0
+        }],
+        labels: items.length > 0 ? labels : []
       }
   }
 }
@@ -111,6 +165,5 @@ export {
   formatError,
   generateChartConfigs,
   groupBy,
-  idx,
   registerVuexModule
 }
