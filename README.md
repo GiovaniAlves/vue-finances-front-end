@@ -1,6 +1,6 @@
 # Vue Finances Front End
 
-### Was developed during the Vue JS - O Guia Completo course of professor Plinio Naves this Front End application using Vue JS, Graphql and Apollo Boost.
+### Was developed during the Vue JS - O Guia Completo course of professor Plinio Naves this Front End application using Vue JS, Graphql and Apollo Client.
 
 ### Project setup
 ```
